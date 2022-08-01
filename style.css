@@ -1,0 +1,42 @@
+*,
+*:after,
+*:before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+
+body,
+button,
+input,
+table,
+textarea,
+select {
+  font: normal 16px/1.5 monospace;
+}
+
+#canvas1 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+}
+
+.controls {
+  position: absolute;
+  z-index: 1000;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.controls,
+select,
+option {
+  font-size: 25px;
+}
