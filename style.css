@@ -8,35 +8,27 @@
 html,
 body {
   height: 100%;
+  background-color: black;
 }
 
-body,
-button,
-input,
-table,
-textarea,
-select {
-  font: normal 16px/1.5 monospace;
-}
-
-#canvas1 {
+#container {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 600px;
-  height: 600px;
+  width: 800px;
+  font-size: 25px;
 }
 
-.controls {
-  position: absolute;
-  z-index: 1000;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%);
+#canvas1 {
+  position: relative;
+  width: 800px;
+  height: 500px;
 }
-.controls,
-select,
-option {
-  font-size: 25px;
+.slider {
+  width: 100%;
+  cursor: pointer;
+}
+p {
+  color: white;
 }
