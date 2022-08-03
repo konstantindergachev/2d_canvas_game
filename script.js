@@ -1,98 +1,79 @@
-const animationState = [
-  {
-    name: 'idle',
-    frames: 7,
-  },
-  {
-    name: 'jump',
-    frames: 7,
-  },
-  {
-    name: 'fall',
-    frames: 7,
-  },
-  {
-    name: 'run',
-    frames: 9,
-  },
-  {
-    name: 'dizzy',
-    frames: 11,
-  },
-  {
-    name: 'sit',
-    frames: 5,
-  },
-  {
-    name: 'roll',
-    frames: 7,
-  },
-  {
-    name: 'bite',
-    frames: 7,
-  },
-  {
-    name: 'ko',
-    frames: 12,
-  },
-  {
-    name: 'getHit',
-    frames: 4,
-  },
-];
+/**@type {HTMLCanvasElement} */
 
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
-const CANVAS_WIDTH = (canvas.width = 600);
-const CANVAS_HEIGHT = (canvas.height = 600);
+const CANVAS_WIDTH = (canvas.width = 500);
+const CANVAS_HEIGHT = (canvas.height = 700);
+const explosions = [];
+let canvasPosition = canvas.getBoundingClientRect();
 
-let playerState = 'idle';
-const dropdown = document.getElementById('animations');
-dropdown.addEventListener('change', (ev) => (playerState = ev.target.value));
-
-const playerImage = new Image();
-playerImage.src = 'images/shadow_dog.png';
-const destinationX = 0;
-const destinationY = 0;
-const spriteWidth = 575; //6876px/12column = 573px per 1column
-const spriteHeight = 523; //5230px/10SpriteColumns = 523px per 1row
-let gameFrame = 0;
-const everyCountOfFrames = 5;
-
-const spriteAnimations = [];
-
-animationState.forEach((state, idx) => {
-  let frames = {
-    loc: [],
-  };
-
-  for (let j = 0; j < state.frames; j++) {
-    let positionX = j * spriteWidth;
-    let positionY = idx * spriteHeight;
-    frames.loc.push({ x: positionX, y: positionY });
+class Explosion {
+  constructor(x, y) {
+    this.spriteWidth = 200;
+    this.spriteHeight = 179;
+    this.width = this.spriteWidth * 0.7;
+    this.height = this.spriteHeight * 0.7;
+    this.x = x;
+    this.y = y;
+    this.image = new Image();
+    this.image.src = 'images/boom.png';
+    this.frame = 0;
+    this.timer = 0;
+    this.angle = Math.random() * 6.2;
+    this.sound = new Audio();
+    this.sound.src = 'sounds/IceAttack2.wav';
   }
-  spriteAnimations[state.name] = frames;
-});
+  update() {
+    if (this.frame === 0) this.sound.play();
+    this.timer++;
+    if (this.timer % 10 === 0) {
+      this.frame++;
+    }
+  }
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    ctx.drawImage(
+      this.image,
+      this.spriteWidth * this.frame,
+      0,
+      this.spriteWidth,
+      this.spriteHeight,
+      0 - this.width / 2,
+      0 - this.height / 2,
+      this.width,
+      this.height
+    );
+    ctx.restore();
+  }
+}
+
+const createAnimation = (ev) => {
+  let positionX = ev.x - canvasPosition.left;
+  let positionY = ev.y - canvasPosition.top;
+
+  explosions.push(new Explosion(positionX, positionY));
+};
 
 const animate = () => {
-  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  let position =
-    Math.floor(gameFrame / everyCountOfFrames) % spriteAnimations[playerState].loc.length;
-  let frameX = spriteWidth * position;
-  let frameY = spriteAnimations[playerState].loc[position].y;
-  ctx.drawImage(
-    playerImage,
-    frameX,
-    frameY,
-    spriteWidth,
-    spriteHeight,
-    destinationX,
-    destinationY,
-    spriteWidth,
-    spriteHeight
-  );
-
-  gameFrame++;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < explosions.length; i++) {
+    explosions[i].update();
+    explosions[i].draw();
+    if (explosions[i].frame > 5) {
+      explosions.splice(i, 1);
+      i--;
+    }
+  }
   requestAnimationFrame(animate);
 };
 animate();
+
+window.addEventListener('click', (ev) => {
+  createAnimation(ev);
+});
+
+// window.addEventListener('mousemove', (ev) => {
+//   createAnimation(ev);
+// });
