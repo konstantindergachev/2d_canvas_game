@@ -19,24 +19,22 @@ select {
   font: normal 16px/1.5 monospace;
 }
 
-#canvas1 {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px;
-  height: 600px;
+body {
+  background: url(images/background_single.png) no-repeat;
+  background-size: cover;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.controls {
+#canvas1 {
   position: absolute;
-  z-index: 1000;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
 }
-.controls,
-select,
-option {
-  font-size: 25px;
+
+#collisionCanvas {
+  opacity: 0;
 }
