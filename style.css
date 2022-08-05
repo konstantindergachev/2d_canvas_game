@@ -24,19 +24,11 @@ select {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 600px;
-  height: 600px;
+  width: 500px;
+  height: 800px;
+  border: 3px solid black;
 }
 
-.controls {
-  position: absolute;
-  z-index: 1000;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.controls,
-select,
-option {
-  font-size: 25px;
+img {
+  display: none;
 }
