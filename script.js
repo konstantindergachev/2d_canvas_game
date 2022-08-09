@@ -3,7 +3,7 @@
 window.addEventListener('load', () => {
   const canvas = document.getElementById('canvas1');
   const ctx = canvas.getContext('2d');
-  canvas.width = 800;
+  canvas.width = 1400;
   canvas.height = 720;
   let enemies = [];
   let score = 0;
@@ -12,6 +12,8 @@ window.addEventListener('load', () => {
   class InputHandler {
     constructor() {
       this.keys = [];
+      this.touchY = '';
+      this.touchTrashold = 30;
       window.addEventListener('keydown', (ev) => {
         if (
           (ev.key === 'ArrowDown' ||
@@ -21,6 +23,8 @@ window.addEventListener('load', () => {
           this.keys.indexOf(ev.key) === -1
         ) {
           this.keys.push(ev.key);
+        } else if (ev.key === 'Enter' && gameOver) {
+          restartGame();
         }
       });
       window.addEventListener('keyup', (ev) => {
@@ -33,6 +37,22 @@ window.addEventListener('load', () => {
           this.keys.splice(this.keys.indexOf(ev.key), 1);
         }
       });
+      window.addEventListener('touchstart', (ev) => {
+        this.touchY = ev.changedTouches[0].pageY;
+      });
+      window.addEventListener('touchmove', (ev) => {
+        const swipeDistance = ev.changedTouches[0].pageY - this.touchY;
+        if (swipeDistance < -this.touchTrashold && this.keys.indexOf('swipe up') === -1) {
+          this.keys.push('swipe up');
+        } else if (swipeDistance > this.touchTrashold && this.keys.indexOf('swipe down') === -1) {
+          this.keys.push('swipe down');
+          if (gameOver) restartGame();
+        }
+      });
+      window.addEventListener('touchend', (ev) => {
+        this.keys.splice(this.keys.indexOf('swipe up'), 1);
+        this.keys.splice(this.keys.indexOf('swipe down'), 1);
+      });
     }
   }
   class Player {
@@ -41,7 +61,7 @@ window.addEventListener('load', () => {
       this.gameHeight = gameHeight;
       this.width = 200;
       this.height = 200;
-      this.x = 0;
+      this.x = 100;
       this.y = this.gameHeight - this.height;
       this.image = document.getElementById('playerImage');
       this.frameX = 0;
@@ -54,24 +74,13 @@ window.addEventListener('load', () => {
       this.velocityY = 0;
       this.weight = 1;
     }
+    restart() {
+      this.x = 100;
+      this.y = this.gameHeight - this.height;
+      this.frameY = 0;
+      this.maxFrame = 8;
+    }
     draw(context) {
-      context.strokeStyle = 'white';
-      context.strokeRect(this.x, this.y, this.width, this.y);
-      context.beginPath();
-      context.arc(
-        this.x + this.width / 2,
-        this.y + this.height / 2,
-        this.width / 2,
-        0,
-        Math.PI * 2
-      );
-      context.stroke();
-      context.stroke();
-      context.strokeStyle = 'blue';
-      context.beginPath();
-      context.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
-      context.stroke();
-
       context.drawImage(
         this.image,
         this.frameX * this.width,
@@ -109,7 +118,10 @@ window.addEventListener('load', () => {
         this.speed = 5;
       } else if (input.keys.indexOf('ArrowLeft') > -1) {
         this.speed = -5;
-      } else if (input.keys.indexOf('ArrowUp') > -1 && this.#onGround()) {
+      } else if (
+        (input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('swipe up') > -1) &&
+        this.#onGround()
+      ) {
         this.velocityY -= 32;
       } else {
         this.speed = 0;
@@ -162,6 +174,9 @@ window.addEventListener('load', () => {
       this.x -= this.speed;
       if (this.x < 0 - this.width) this.x = 0;
     }
+    restart() {
+      this.x = 0;
+    }
   }
   class Enemy {
     constructor(gameWidth, gameHeight) {
@@ -181,22 +196,6 @@ window.addEventListener('load', () => {
       this.markForDeletion = false;
     }
     draw(context) {
-      context.strokeStyle = 'white';
-      context.strokeRect(this.x, this.y, this.width, this.y);
-      context.beginPath();
-      context.arc(
-        this.x + this.width / 2,
-        this.y + this.height / 2,
-        this.width / 2,
-        0,
-        Math.PI * 2
-      );
-      context.stroke();
-      context.strokeStyle = 'blue';
-      context.beginPath();
-      context.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
-      context.stroke();
-
       context.drawImage(
         this.image,
         this.frameX * this.width,
@@ -240,6 +239,7 @@ window.addEventListener('load', () => {
   };
   const displayStatusText = (context) => {
     context.font = '30px Arial';
+    context.textAlign = 'left';
     context.fillStyle = 'black';
     context.fillText(`Score: ${score}`, 20, 50);
     context.fillStyle = 'white';
@@ -249,10 +249,27 @@ window.addEventListener('load', () => {
       context.font = '40px Arial';
       context.textAlign = 'center';
       context.fillStyle = 'black';
-      context.fillText(`Game over, try again!`, canvas.width / 2, canvas.height / 2);
+      context.fillText(
+        `Game over, press Enter or swipe down to restart!`,
+        canvas.width / 2,
+        canvas.height / 2
+      );
       context.fillStyle = 'red';
-      context.fillText(`Game over, try again!`, canvas.width / 2 + 2, canvas.height / 2 + 2);
+      context.fillText(
+        `Game over, press Enter or swipe down to restart!`,
+        canvas.width / 2 + 2,
+        canvas.height / 2 + 2
+      );
     }
+  };
+
+  const restartGame = () => {
+    player.restart();
+    background.restart();
+    enemies = [];
+    score = 0;
+    gameOver = false;
+    animate(0);
   };
 
   const input = new InputHandler();
