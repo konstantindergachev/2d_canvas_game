@@ -8,6 +8,7 @@ window.addEventListener('load', () => {
   let enemies = [];
   let score = 0;
   let gameOver = false;
+  const fullScreenButton = document.getElementById('fullScreenButton');
 
   class InputHandler {
     constructor() {
@@ -96,10 +97,10 @@ window.addEventListener('load', () => {
     update(input, deltaTime, enemies) {
       //collision detection
       enemies.forEach((enemy) => {
-        const distanceX = enemy.x + enemy.width / 2 - (this.x + this.width / 2);
-        const distanceY = enemy.y + enemy.height / 2 - (this.y + this.height / 2);
+        const distanceX = enemy.x + (enemy.width / 2 - 20) - (this.x + this.width / 2);
+        const distanceY = enemy.y + enemy.height / 2 - (this.y + this.height / 2) + 20;
         const distanceHypotenuse = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-        if (distanceHypotenuse < enemy.width / 2 + this.width / 2) {
+        if (distanceHypotenuse < enemy.width / 3 + this.width / 3) {
           gameOver = true;
         }
       });
@@ -272,6 +273,19 @@ window.addEventListener('load', () => {
     animate(0);
   };
 
+  const toggleFullScreen = async () => {
+    if (!document.fullscreenElement) {
+      try {
+        await canvas.requestFullscreen();
+      } catch (error) {
+        alert(`Error, can't enable full-screen mode: ${error.message}`);
+      }
+    } else {
+      document.exitFullscreen();
+    }
+  };
+  fullScreenButton.addEventListener('click', toggleFullScreen);
+
   const input = new InputHandler();
   const player = new Player(canvas.width, canvas.height);
   const background = new Background(canvas.width, canvas.height);
@@ -286,7 +300,7 @@ window.addEventListener('load', () => {
     lastTime = timeStamp;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     background.draw(ctx);
-    // background.update();
+    background.update();
     player.draw(ctx);
     player.update(input, deltaTime, enemies);
     handleEnemies(deltaTime);
