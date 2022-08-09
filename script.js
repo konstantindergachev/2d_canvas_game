@@ -7,6 +7,7 @@ window.addEventListener('load', () => {
   canvas.height = 720;
   let enemies = [];
   let score = 0;
+  let gameOver = false;
 
   class InputHandler {
     constructor() {
@@ -54,6 +55,23 @@ window.addEventListener('load', () => {
       this.weight = 1;
     }
     draw(context) {
+      context.strokeStyle = 'white';
+      context.strokeRect(this.x, this.y, this.width, this.y);
+      context.beginPath();
+      context.arc(
+        this.x + this.width / 2,
+        this.y + this.height / 2,
+        this.width / 2,
+        0,
+        Math.PI * 2
+      );
+      context.stroke();
+      context.stroke();
+      context.strokeStyle = 'blue';
+      context.beginPath();
+      context.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
+      context.stroke();
+
       context.drawImage(
         this.image,
         this.frameX * this.width,
@@ -66,7 +84,17 @@ window.addEventListener('load', () => {
         this.height
       );
     }
-    update(input, deltaTime) {
+    update(input, deltaTime, enemies) {
+      //collision detection
+      enemies.forEach((enemy) => {
+        const distanceX = enemy.x + enemy.width / 2 - (this.x + this.width / 2);
+        const distanceY = enemy.y + enemy.height / 2 - (this.y + this.height / 2);
+        const distanceHypotenuse = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        if (distanceHypotenuse < enemy.width / 2 + this.width / 2) {
+          gameOver = true;
+        }
+      });
+
       //sprite animation
       if (this.frameTimer > this.frameInterval) {
         if (this.frameX >= this.maxFrame) this.frameX = 0;
@@ -153,6 +181,22 @@ window.addEventListener('load', () => {
       this.markForDeletion = false;
     }
     draw(context) {
+      context.strokeStyle = 'white';
+      context.strokeRect(this.x, this.y, this.width, this.y);
+      context.beginPath();
+      context.arc(
+        this.x + this.width / 2,
+        this.y + this.height / 2,
+        this.width / 2,
+        0,
+        Math.PI * 2
+      );
+      context.stroke();
+      context.strokeStyle = 'blue';
+      context.beginPath();
+      context.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
+      context.stroke();
+
       context.drawImage(
         this.image,
         this.frameX * this.width,
@@ -200,6 +244,15 @@ window.addEventListener('load', () => {
     context.fillText(`Score: ${score}`, 20, 50);
     context.fillStyle = 'white';
     context.fillText(`Score: ${score}`, 22, 52);
+
+    if (gameOver) {
+      context.font = '40px Arial';
+      context.textAlign = 'center';
+      context.fillStyle = 'black';
+      context.fillText(`Game over, try again!`, canvas.width / 2, canvas.height / 2);
+      context.fillStyle = 'red';
+      context.fillText(`Game over, try again!`, canvas.width / 2 + 2, canvas.height / 2 + 2);
+    }
   };
 
   const input = new InputHandler();
@@ -218,10 +271,10 @@ window.addEventListener('load', () => {
     background.draw(ctx);
     // background.update();
     player.draw(ctx);
-    player.update(input, deltaTime);
+    player.update(input, deltaTime, enemies);
     handleEnemies(deltaTime);
     displayStatusText(ctx);
-    requestAnimationFrame(animate);
+    if (!gameOver) requestAnimationFrame(animate);
   };
   animate(0);
 });
