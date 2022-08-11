@@ -1,28 +1,34 @@
-import Player from './js/player.js';
-import InputHandler from './js/input.js';
-import { drawStatusText } from './js/utils.js';
+import { InputHandler } from './js/input.js';
+import { Player } from './js/player.js';
 
 window.addEventListener('load', function () {
-  const loading = document.getElementById('loading');
-  loading.style.display = 'none';
-
   const canvas = document.getElementById('canvas1');
   const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = 500;
+  canvas.height = 500;
 
-  const player = new Player(canvas.width, canvas.height);
-  const input = new InputHandler();
+  class Game {
+    constructor(width, height) {
+      this.width = width;
+      this.height = height;
+      this.player = new Player(this);
+      this.input = new InputHandler();
+    }
+    update() {
+      this.player.update(this.input.keys);
+    }
+    draw(context) {
+      this.player.draw(context);
+    }
+  }
 
-  let lastTime = 0;
-  const animate = (timeStamp) => {
-    const deltaTime = timeStamp - lastTime;
-    lastTime = timeStamp;
+  const game = new Game(canvas.width, canvas.height);
+
+  const animate = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    player.update(input.lastKey);
-    player.draw(ctx, deltaTime);
-    drawStatusText(ctx, input, player);
+    game.update();
+    game.draw(ctx);
     requestAnimationFrame(animate);
   };
-  animate(0);
+  animate();
 });
