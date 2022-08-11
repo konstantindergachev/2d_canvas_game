@@ -39,10 +39,14 @@ export default class Player {
 
     this.frameX = 0;
     this.frameY = 0;
+    this.maxFrame = 6;
     this.speed = 0;
     this.maxSpeed = 10;
   }
   draw(context) {
+    if (this.frameX < this.maxFrame) this.frameX++;
+    else this.frameX = 0;
+
     context.drawImage(
       this.image,
       this.width * this.frameX,
