@@ -27,6 +27,9 @@ window.addEventListener('load', function () {
       this.debug = true;
       this.score = 0;
       this.fontColor = 'black';
+      this.player.currentState = this.player.state[0];
+      this.player.currentState.enter();
+      this.particles = [];
     }
     update(deltaTime) {
       this.background.update();
@@ -44,6 +47,12 @@ window.addEventListener('load', function () {
         enemy.update(deltaTime);
         if (enemy.markedForDeletion) this.enemies.splice(this.enemies.indexOf(enemy), 1);
       });
+
+      //handle particles
+      this.particles.forEach((particle, idx) => {
+        particle.update();
+        if (particle.markedForDeletion) this.particles.splice(idx, 1);
+      });
     }
     draw(context) {
       this.background.draw(context);
@@ -51,6 +60,10 @@ window.addEventListener('load', function () {
 
       this.enemies.forEach((enemy) => {
         enemy.draw(context);
+      });
+
+      this.particles.forEach((particle) => {
+        particle.draw(context);
       });
 
       this.UI.draw(context);
