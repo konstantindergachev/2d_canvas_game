@@ -24,13 +24,14 @@ window.addEventListener('load', function () {
       this.enemies = [];
       this.enemyTimer = 0;
       this.enemyInterval = 1000;
-      this.debug = true;
+      this.debug = false;
       this.score = 0;
       this.fontColor = 'black';
       this.player.currentState = this.player.state[0];
       this.player.currentState.enter();
       this.particles = [];
       this.maxParticles = 50;
+      this.collisions = [];
     }
     update(deltaTime) {
       this.background.update();
@@ -57,6 +58,12 @@ window.addEventListener('load', function () {
       if (this.particles.length > this.maxParticles) {
         this.particles = this.particles.slice(0, this.maxParticles);
       }
+
+      //handle collision sprites
+      this.collisions.forEach((collision, idx) => {
+        collision.update(deltaTime);
+        if (collision.markedForDeletion) this.collisions.splice(idx, 1);
+      });
     }
     draw(context) {
       this.background.draw(context);
@@ -68,6 +75,10 @@ window.addEventListener('load', function () {
 
       this.particles.forEach((particle) => {
         particle.draw(context);
+      });
+
+      this.collisions.forEach((collision) => {
+        collision.draw(context);
       });
 
       this.UI.draw(context);
