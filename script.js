@@ -30,6 +30,7 @@ window.addEventListener('load', function () {
       this.player.currentState = this.player.state[0];
       this.player.currentState.enter();
       this.particles = [];
+      this.maxParticles = 50;
     }
     update(deltaTime) {
       this.background.update();
@@ -53,6 +54,9 @@ window.addEventListener('load', function () {
         particle.update();
         if (particle.markedForDeletion) this.particles.splice(idx, 1);
       });
+      if (this.particles.length > this.maxParticles) {
+        this.particles = this.particles.slice(0, this.maxParticles);
+      }
     }
     draw(context) {
       this.background.draw(context);
