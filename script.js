@@ -36,6 +36,7 @@ window.addEventListener('load', function () {
       this.maxTime = 10000;
       this.gameOver = false;
       this.lives = 5;
+      this.floatingMessages = [];
     }
     update(deltaTime) {
       this.time += deltaTime;
@@ -56,6 +57,11 @@ window.addEventListener('load', function () {
         if (enemy.markedForDeletion) this.enemies.splice(this.enemies.indexOf(enemy), 1);
       });
 
+      //handle messages
+      this.floatingMessages.forEach((message) => {
+        message.update();
+      });
+
       //handle particles
       this.particles.forEach((particle, idx) => {
         particle.update();
@@ -70,6 +76,8 @@ window.addEventListener('load', function () {
         collision.update(deltaTime);
         if (collision.markedForDeletion) this.collisions.splice(idx, 1);
       });
+
+      this.floatingMessages = this.floatingMessages.filter((message) => !message.markedForDeletion);
     }
     draw(context) {
       this.background.draw(context);
@@ -85,6 +93,10 @@ window.addEventListener('load', function () {
 
       this.collisions.forEach((collision) => {
         collision.draw(context);
+      });
+
+      this.floatingMessages.forEach((message) => {
+        message.draw(context);
       });
 
       this.UI.draw(context);
