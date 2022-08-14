@@ -32,8 +32,13 @@ window.addEventListener('load', function () {
       this.particles = [];
       this.maxParticles = 50;
       this.collisions = [];
+      this.time = 0;
+      this.maxTime = 10000;
+      this.gameOver = false;
     }
     update(deltaTime) {
+      this.time += deltaTime;
+      if (this.time > this.maxTime) this.gameOver = true;
       this.background.update();
       this.player.update(this.input.keys, deltaTime);
 
@@ -56,7 +61,7 @@ window.addEventListener('load', function () {
         if (particle.markedForDeletion) this.particles.splice(idx, 1);
       });
       if (this.particles.length > this.maxParticles) {
-        this.particles = this.particles.slice(0, this.maxParticles);
+        this.particles.length = this.maxParticles;
       }
 
       //handle collision sprites
@@ -99,7 +104,7 @@ window.addEventListener('load', function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     game.update(deltaTime);
     game.draw(ctx);
-    requestAnimationFrame(animate);
+    if (!game.gameOver) requestAnimationFrame(animate);
   };
   animate(0);
 });
