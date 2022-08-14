@@ -1,8 +1,9 @@
 export class UI {
   constructor(game) {
     this.game = game;
-    this.fontSize = 20;
-    this.fontFamily = 'monospace';
+    this.fontSize = 30;
+    this.fontFamily = 'Creepster';
+    this.livesImage = document.getElementById('lives');
   }
   draw(context) {
     context.save();
@@ -40,6 +41,11 @@ export class UI {
           this.game.height * 0.5 + 20
         );
       }
+    }
+
+    //lives
+    for (let i = 0; i < this.game.lives; i++) {
+      context.drawImage(this.livesImage, 20 * i + 20, 95, 25, 25);
     }
 
     context.restore();
