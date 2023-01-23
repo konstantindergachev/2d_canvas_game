@@ -5,6 +5,8 @@ import { Player } from './js/player.js';
 import { UI } from './js/UI.js';
 
 window.addEventListener('load', function () {
+  document.getElementById('restart').addEventListener('click', () => this.location.reload());
+
   const canvas = document.getElementById('canvas1');
   const ctx = canvas.getContext('2d');
   canvas.width = 900;
